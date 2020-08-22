@@ -5,6 +5,8 @@ const cors = require('cors');
 
 const { json } = require('body-parser');
 
+const User = require('./models/user');
+
 dotenv.config();
 const app = express();
 
@@ -23,20 +25,34 @@ mongoose
   .catch((error) => console.log('データベース接続失敗', error));
 
 // routes
-app.get('/user', (req, res) => {
-  res.send('get all todos');
+app.get('/user', async (req, res) => {
+  console.log('body', req.body);
+  console.log('header', req.headers);
+  const { apikey } = req.headers;
+  if (apikey !== 'key123') res.status(401).send('apikeyが間違っています');
+  try {
+    const users = await User.find();
+    res.send(users);
+  } catch (error) {
+    res.status(400).send('不正なリクエストです');
+  }
 });
 
-app.post('/user', (req, res) => {
-  res.send('create todo');
-});
-
-app.patch('/user', (req, res) => {
-  res.send('update todo');
-});
-
-app.delete('/user', (req, res) => {
-  res.send('delete todo');
+app.post('/user', async (req, res) => {
+  console.log('body', req.body);
+  console.log('header', req.headers);
+  const { apikey } = req.headers;
+  if (apikey !== 'key123') res.status(401).send('apikeyが間違っています');
+  const { name, email, skills } = req.body;
+  const newUser = new User({ name, email, skills });
+  try {
+    await newUser.save();
+  } catch (error) {
+    console.log('ERROR', error);
+    res.status(400).send('不正なリクエストです');
+  } finally {
+    res.send(newUser);
+  }
 });
 
 app.listen(process.env.PORT, () => {
