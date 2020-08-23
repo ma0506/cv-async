@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const fs = require('fs');
 
 const { json } = require('body-parser');
 
@@ -9,6 +10,8 @@ const User = require('./models/user');
 
 dotenv.config();
 const app = express();
+
+const html = fs.readFileSync(`${__dirname}/index.html`, 'utf-8');
 
 app.use(cors());
 app.use(json());
@@ -25,6 +28,10 @@ mongoose
   .catch((error) => console.log('データベース接続失敗', error));
 
 // routes
+app.get('/', (req, res) => {
+  res.send(html);
+});
+
 app.get('/user', async (req, res) => {
   console.log('body', req.body);
   console.log('header', req.headers);
