@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(json());
 
-// db接続
+// データベース接続
 mongoose
   .connect(process.env.DATABASE || 'mongodb://localhost:27017/testapp', {
     useNewUrlParser: true,
